@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>요양합격 CBT</title>
+    <style>
+        :root { --cbt-dark: #2c3e50; --cbt-blue: #34495e; --bg: #f4f7f9; --wrong-gray: #e9ecef; --done-gray: #bdc3c7; }
+        body { font-family: 'Malgun Gothic', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+
+        .cbt-header { 
+            background: var(--cbt-dark); color: white; padding: 10px 15px; 
+            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .home-icon { width: 24px; height: 24px; cursor: pointer; fill: white; display: flex; align-items: center; }
+        .font-controls { display: flex; align-items: center; gap: 8px; background: #444; padding: 4px 10px; border-radius: 20px; color: white; font-size: 0.9rem; }
+        .font-btn { background: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; color: black; }
+        
+        .home-container { padding: 20px; text-align: center; max-width: 500px; margin: 0 auto; padding-bottom: 100px; }
+        .section-title { text-align: left; font-size: 1.1rem; font-weight: bold; color: var(--cbt-dark); margin: 20px 0 10px 5px; border-left: 4px solid #007bff; padding-left: 10px; }
+        .menu-btn { width: 100%; padding: 18px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 12px; background: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .sub-menu { display: none; background: #e9ecef; border-radius: 12px; padding: 10px; margin-bottom: 15px; }
+        .sub-btn { width: 100%; padding: 14px; margin: 5px 0; border: none; border-radius: 8px; background: #dae4f1; font-size: 1rem; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .sub-btn.completed { background: var(--done-gray); color: #666; }
+
+        .progress-section { padding: 15px 20px; background: white; border-bottom: 1px solid #eee; }
+        .progress-container { width: 100%; background: #eee; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: #4caf50; transition: width 0.3s; }
+        .quiz-container { padding: 20px; max-width: 800px; margin: 0 auto; position: relative; min-height: 400px; }
+        #circle-mark { display: none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; border: 15px solid rgba(255, 0, 0, 0.2); border-radius: 50%; z-index: 999; pointer-events: none; }
+        .opt-box { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #eee; border-radius: 8px; background: white; text-align: left; font-size: inherit; cursor: pointer; position: relative; z-index: 10; line-height: 1.4; }
+        .opt-box.wrong { background: var(--wrong-gray); color: #999; }
+        .opt-box.correct { background: #eef7ff; color: #007bff; font-weight: bold; border-color: #007bff; }
+        
+        .result-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; text-align: center; }
+        .result-score-box { background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0; }
+        .result-btns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .action-btn { padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-next-home { background: var(--cbt-blue); color: white; grid-column: span 2; margin-top: 5px; }
+
+        .footer { position: fixed; bottom: 0; width: 100%; background: #f8f9fa; z-index: 100; border-top: 1px solid #ddd; }
+        .footer-btns { display: flex; width: 100%; }
+        .footer-btns button { flex: 1; padding: 18px; border: none; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+        .prev-btn { background: #6c757d; color: white; border-right: 1px solid #5a6268 !important; }
+        .next-btn { background: var(--cbt-blue); color: white; }
+        .ad-banner { background: #eee; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #777; }
+        .check-btn { border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.9rem; background: white; padding: 5px 12px; }
+    </style>
+</head>
+<body>
+
+
+
+<div id="screen-main">
+    <div class="home-container">
+        <h1 style="color: var(--cbt-dark); margin-top: 20px; font-size: 2rem;">요양합격</h1>
+
+        <div class="section-title">실전 모의고사</div>
+        <button class="menu-btn" onclick="toggleMenu('mock-menu')">📝 기출기반 예상 문제 (80문제) <span>▼</span></button>
+        <div id="mock-menu" class="sub-menu">
+            <button class="sub-btn" onclick="handleMockStart('제1회 모의고사')">제1회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제2회 모의고사')">제2회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제3회 모의고사')">제3회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제4회 모의고사')">제4회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제5회 모의고사')">제5회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제6회 모의고사')">제6회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제7회 모의고사')">제7회 모의고사</button>
+            <button class="sub-btn" onclick="handleMockStart('제8회 모의고사')">제8회 모의고사</button>
+            <div style="margin: 10px 0; border-top: 1px dashed #ccc;"></div>
+            <button class="sub-btn" style="background:#fff3cd;" onclick="handleRandomMock('랜덤 모의고사 1')">🎲 랜덤 모의고사 1</button>
+            <button class="sub-btn" style="background:#fff3cd;" onclick="handleRandomMock('랜덤 모의고사 2')">🎲 랜덤 모의고사 2</button>
+            <button class="sub-btn" style="background:#fff3cd;" onclick="handleRandomMock('랜덤 모의고사 3')">🎲 랜덤 모의고사 3</button>
+            <button class="sub-btn" style="background:#fff3cd;" onclick="handleRandomMock('랜덤 모의고사 4')">🎲 랜덤 모의고사 4</button>
+            <button class="sub-btn" style="background:#fff3cd;" onclick="handleRandomMock('랜덤 모의고사 5')">🎲 랜덤 모의고사 5</button>
+        </div>
+
+        <div class="section-title">기출핵심 살펴보기</div>
+        <button class="menu-btn" style="background:#fff3cd;" onclick="handleRandomShortQuiz(10)">
+            🎲 기출핵심 랜덤 10문제 <span>▶</span>
+        </button>
+
+        <div class="section-title">과목별 집중 학습</div>
+        <button class="menu-btn" onclick="toggleMenu('subject-menu')">📚 영역별 문제 풀기 <span>▼</span></button>
+        <div id="subject-menu" class="sub-menu">
+        <button class="sub-btn" onclick="startQuiz('요양보호론', 35)">요양보호론 (필기)</button>
+        <button class="sub-btn" onclick="startQuiz('요양보호실무', 45)">요양보호실무 (실기)</button>
+        </div>
+        
+        <div class="section-title">학습 도구</div>
+        <button class="menu-btn" onclick="showChecked()">⭐ 체크한 문제 복습</button>
+        
+        <div class="section-title">학습 참고 자료</div>
+      <!--  <button class="menu-btn" onclick="window.open('https://www.youtube.com/results?search_query=요양보호사+강의')">📺 유튜브 요양보호 강의 보기</button> -->
+        <button class="menu-btn" onclick="window.open('https://www.kuksiwon.or.kr/CBT_35/index.html#/')">🖥️ 국시원 CBT 체험하기</button>
+
+		<div class="section-title">도움말</div>
+		<button class="menu-btn" style="background:#e9ecef; margin-bottom: 40px;" onclick="showManual()">
+			📖 요양합격 이용방법 <span>▶</span>
+		</button>
+
+		<div style="font-size: 0.75rem; color: #888; padding: 10px; border-top: 1px dashed #ccc;">
+			본 앱의 콘텐츠는 최신 기출문제를 분석하여 재구성한 예상 문제입니다. 실제 시험 문제와 완벽히 일치하지 않을 수 있으며, 최종 정답은 국시원 발표를 기준으로 합니다. 본 앱은 학습을 돕기 위한 보조 도구로, 결과에 대한 법적 책임은 사용자에게 있습니다.
+		</div>
+    </div>
+</div>
+
+<div id="screen-quiz" style="display:none;">
+    <div class="cbt-header">
+        <div class="header-left">
+            <div class="home-icon" onclick="saveAndExit()">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <div class="font-controls">
+                <button class="font-btn" onclick="adjustFont(-1)">-</button>
+                <span>글자</span>
+                <button class="font-btn" onclick="adjustFont(1)">+</button>
+            </div>
+        </div>
+        <div id="quiz-title" style="font-weight:bold;">요양합격</div>
+        <div id="timer-display" style="color:#ffc107; font-weight:bold;">90:00</div>
+    </div>
+    
+    <div class="progress-section">
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:bold;">
+            <span id="q-idx-text">문제 1</span><span id="progress-counts">0 / 80</span>
+        </div>
+        <div class="progress-container"><div id="bar" class="progress-bar"></div></div>
+    </div>
+
+    <div class="quiz-container">
+        <div id="circle-mark"></div>
+        <div id="q-content-area">
+            <div class="q-info-row" style="display: flex; gap: 8px; align-items: center; margin-bottom: 15px;">
+                <button id="check-btn" class="check-btn" onclick="toggleCheck()">✓ 체크</button>
+                <button class="check-btn" style="background: #f8f9fa;" onclick="sendFeedback()">💡 의견</button>
+            </div>
+            <div id="q-text" style="font-weight:bold; margin-bottom:20px; line-height:1.5;"></div>
+            <div id="options-wrap"></div>
+            <div id="hint-box" style="display:none; background:#fff9db; padding:15px; border-radius:8px; margin-top:15px; line-height:1.6;"></div>
+        </div>
+
+        <div id="result-area" style="display:none;">
+            <div class="result-card">
+                <h2 id="result-title">학습 완료</h2>
+                <div class="result-score-box">
+                    <div style="font-size:1.3rem; margin-bottom:10px;">맞은 개수: <span id="res-correct" style="color:blue; font-weight:bold;">0</span></div>
+                    <div style="font-size:1.1rem; color:#666;">안 푼 문제: <span id="res-unsolved">0</span></div>
+                </div>
+                <div class="result-btns-grid">
+                    <button class="action-btn btn-next-home" onclick="location.reload()">홈으로 돌아가기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="height:150px;"></div> 
+    <div class="footer" id="quiz-footer">
+        <div class="footer-btns">
+            <button class="prev-btn" onclick="prevQuestion()">◀ 이전</button>
+            <button class="next-btn" onclick="nextQuestion()">다음 ➔</button>
+        </div>
+       
+	   <div class="ad-banner">
+			<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+			<ins class="adsbygoogle"
+				 style="display:inline-block;width:320px;height:50px"
+				 data-ad-client="ca-app-pub-9626208165302787" 
+				 data-ad-slot="6421874744"></ins> 
+			<script>
+				 (adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+		</div>  
+    </div>
+</div>
+
+
+<script  src="./set01_38am.js"></script>
+<script  src="./set02_38pm.js"></script>
+<script  src="./set03_39am.js"></script>
+<script  src="./set04_39pm.js"></script>
+<script  src="./set05_40am.js"></script>
+<script  src="./set06_40pm.js"></script>
+<script  src="./set07_41am.js"></script>
+<script  src="./set08_41pm.js"></script>
+<script  >
+    //import set01_38am from './set01_38am.json';
+    // import set02_38pm from './set02_38pm.json';
+    // import set03_39am from './set03_39am.json';
+    // import set04_39pm from './set04_39pm.json';
+    // import set05_40am from './set05_40am.json';
+    // import set06_40pm from './set06_40pm.json';
+    // import set07_41am from './set07_41am.json';
+    // import set08_41pm from './set08_41pm.json';
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBi52qaq34rtxK7QZCd2Sdh4esiD6NPVr9ikVEPmRp2UHbVps8jVbLh3RphWr5nFIa/exec";
+    
+    // console.dir(set01_38am);
+        const allQuestions = [...set01_38am, ...set02_38pm, ...set03_39am, ...set04_39pm, ...set05_40am, ...set06_40pm , ...set07_41am , ...set08_41pm ];
+    let quizList = [], currentIdx = 0, userAnswers = [], currentMode = "";
+    let fontSizeLevel = 4, timerInterval, timeLeft = 90 * 60;
+    let mockHistory = JSON.parse(localStorage.getItem('mockHistory')) || {};
+    let checkedIds = JSON.parse(localStorage.getItem('checkedQuiz')) || [];
+
+   // window.onload = updateMenuStatus;
+	
+	
+	// 페이지가 열리자마자 실행되는 부분
+	window.addEventListener('load', function() {
+		if (typeof updateMenuStatus === 'function') updateMenuStatus();
+		if (typeof adjustFont === 'function') adjustFont(0);
+		// 팝업 관련 로직은 터치 오류 방지를 위해 삭제되었습니다.
+	});
+
+	// 도움말 버튼 클릭 시 함수 (팝업 대신 메시지창 사용)
+	function showManual() {
+		alert("📖 요양합격 이용방법\n\n1. 글자 크기: 상단 +/- 버튼으로 크게 키울 수 있습니다.\n2. 정답 근거: 문제 풀이 후 노란 박스에서 해설을 확인하세요.\n3. 오답 복습: 80문제를 다 풀면 틀린 문제만 다시 볼 수 있습니다.");
+	}
+
+
+
+    function toggleMenu(id) {
+        const el = document.getElementById(id);
+        const isVisible = (el.style.display === 'block');
+        document.querySelectorAll('.sub-menu').forEach(m => m.style.display = 'none');
+        el.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function updateMenuStatus() {
+        const types = ['제1회 모의고사', '제2회 모의고사', '제3회 모의고사', '제4회 모의고사', '제5회 모의고사', '제6회 모의고사', '제7회 모의고사', '제8회 모의고사'];
+        types.forEach((m, idx) => {
+            const btn = document.querySelector(`button[onclick*="'${m}'"]`);
+            if(!btn) return;
+            const status = mockHistory[m];
+            if(status) {
+                if(status.completed) {
+                    btn.style.background = "#bdc3c7";
+                    btn.innerHTML += " <span>(완료)</span>";
+                }
+            }
+        });
+    }
+
+    // 추가된 함수: 전체 문제 중 랜덤으로 10개를 골라주는 로직
+    function handleRandomShortQuiz(count) {
+        currentMode = "기출핵심 10문제";
+        // 전체 문제(allQuestions)를 무작위로 섞음
+        let shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+        // 그중 앞의 10개만 추출
+        quizList = shuffled.slice(0, count);
+        userAnswers = new Array(quizList.length).fill().map(() => ({ selected: null, wrongAttempts: [] }));
+        currentIdx = 0;
+        initQuizScreen(); 
+    }
+
+    function handleMockStart(mode) {
+        currentMode = mode;
+		
+		let filtered = allQuestions.filter(q => q.cat === mode);
+		
+		// **[추가] 해당 회차 문제들을 무작위로 섞습니다.**
+		filtered.sort(() => Math.random() - 0.5);
+			
+        if(mockHistory[mode] && !mockHistory[mode].completed) {
+            if(confirm("이전에 풀던 기록이 있습니다. 이어서 푸시겠습니까?")) {
+                resumeQuiz(mode);
+                return;
+            }
+        }
+        // startQuiz(mode, 80);
+		
+		quizList = filtered.slice(0, 80);
+		userAnswers = new Array(quizList.length).fill().map(() => ({ selected: null, wrongAttempts: [] }));
+		currentIdx = 0;
+		initQuizScreen();
+    }
+
+    function handleRandomMock(modeName) {
+        currentMode = modeName;
+        let shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+        quizList = shuffled.slice(0, 80);
+        userAnswers = new Array(quizList.length).fill().map(() => ({ selected: null, wrongAttempts: [] }));
+        currentIdx = 0;
+        initQuizScreen();
+    }
+
+    function startQuiz(mode, count) {
+        currentMode = mode;
+        let filtered = allQuestions.filter(q => q.sub.includes(mode)); // sub 필드 기준 검색
+		if(filtered.length === 0) filtered = [...allQuestions]; 
+		
+		// **[추가] 영역별 문제도 무작위로 섞습니다.**
+		filtered.sort(() => Math.random() - 0.5);
+		
+		quizList = filtered.slice(0, count);
+		userAnswers = new Array(quizList.length).fill().map(() => ({ selected: null, wrongAttempts: [] }));
+		currentIdx = 0;
+		initQuizScreen();
+	}
+
+    function resumeQuiz(mode) {
+        const history = mockHistory[mode];
+        quizList = history.quizList;
+        userAnswers = history.userAnswers;
+        currentIdx = history.lastIdx;
+        initQuizScreen();
+    }
+
+    function initQuizScreen() {
+        document.getElementById('screen-main').style.display = 'none';
+        document.getElementById('screen-quiz').style.display = 'block';
+        document.getElementById('quiz-title').innerText = currentMode;
+        startTimer();
+        loadQuestion();
+    }
+
+    function startTimer() {
+        if(timerInterval) clearInterval(timerInterval);
+        timeLeft = 90 * 60;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `${mins}:${secs < 10 ? '0'+secs : secs}`;
+            if(timeLeft <= 0) finishSession();
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        const q = quizList[currentIdx];
+        const state = userAnswers[currentIdx];
+        
+		console.log("loadQuestion");
+		console.dir(q);
+				
+        document.getElementById('circle-mark').style.display = 'none';
+        document.getElementById('hint-box').style.display = 'none';
+        document.getElementById('q-idx-text').innerText = `문제 ${currentIdx + 1}`;
+        document.getElementById('q-text').innerText = q.q;
+        document.getElementById('progress-counts').innerText = `${currentIdx + 1} / ${quizList.length}`;
+        document.getElementById('bar').style.width = ((currentIdx + 1) / quizList.length * 100) + "%";
+        
+        document.getElementById('check-btn').style.background = checkedIds.includes(q.id) ? "#ffeb3b" : "white";
+
+        const wrap = document.getElementById('options-wrap');
+        wrap.innerHTML = "";
+        const nums = ["①", "②", "③", "④", "⑤"];
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-box';
+            btn.innerHTML = `<b>${nums[i]}</b> ${opt}`;
+            
+			console.log("a selected:", state.selected);
+			console.log("a answer:", q.answer);
+			console.log("a i     :", i);
+			
+            if(state.selected === q.answer) {				
+                if(i === (q.answer-1)) btn.classList.add('correct');
+                document.getElementById('circle-mark').style.display = 'block';
+                document.getElementById('hint-box').style.display = 'block';
+                document.getElementById('hint-box').innerHTML = `<b>📑 정답 근거:</b><br>${q.note}`;
+            } else if(state.wrongAttempts.includes(i)) {
+                btn.classList.add('wrong');
+            }
+
+            btn.onclick = () => {
+		
+				// increase i +=1 (입력은 0~4, 정답은 1~5)
+				console.log("selected:", state.selected);
+				console.log("answer:", q.answer);
+				console.log("i     :", i);
+							
+                if(state.selected !== q.answer) {
+                    if(i === (q.answer-1)) {
+                        state.selected = i+1;
+                        loadQuestion();
+                    } else {
+                        if(!state.wrongAttempts.includes(i)) {
+                            state.wrongAttempts.push(i);
+                            btn.classList.add('wrong');
+                        }
+                    }
+                }
+            };
+            wrap.appendChild(btn);
+        });
+        window.scrollTo(0,0);
+    }
+
+    function sendFeedback() {
+        const qNum = currentIdx + 1;
+        const comment = prompt(`문제 ${qNum}번에 대한 의견을 남겨주세요.`);
+        if (comment && comment.trim() !== "") {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ questionNum: qNum + "번", comment: comment })
+            })
+            .then(() => { alert("소중한 의견이 전송되었습니다. 감사합니다."); })
+            .catch(error => { alert("전송 중 오류가 발생했습니다."); });
+        }
+    }
+
+    function toggleCheck() {
+        const q = quizList[currentIdx];
+        if (checkedIds.includes(q.id)) { checkedIds = checkedIds.filter(id => id !== q.id); }
+        else { checkedIds.push(q.id); }
+        localStorage.setItem('checkedQuiz', JSON.stringify(checkedIds));
+        document.getElementById('check-btn').style.background = checkedIds.includes(q.id) ? "#ffeb3b" : "white";
+    }
+
+    function showChecked() {
+        const filtered = allQuestions.filter(q => checkedIds.includes(q.id));
+        if(filtered.length === 0) return alert("체크된 문제가 없습니다.");
+        quizList = filtered;
+        userAnswers = new Array(quizList.length).fill().map(() => ({ selected: null, wrongAttempts: [] }));
+        currentIdx = 0;
+        currentMode = "체크 문제 복습";
+        initQuizScreen();
+    }
+
+    function nextQuestion() {
+        if (currentIdx < quizList.length - 1) { currentIdx++; loadQuestion(); }
+        else finishSession();
+    }
+
+    function prevQuestion() {
+        if (currentIdx > 0) { currentIdx--; loadQuestion(); }
+    }
+
+    function saveAndExit() {
+        if(currentMode.includes('모의고사') || currentMode.includes('핵심') || currentMode.includes('영역')) {
+            mockHistory[currentMode] = { quizList: quizList, userAnswers: userAnswers, lastIdx: currentIdx, completed: false };
+            localStorage.setItem('mockHistory', JSON.stringify(mockHistory));
+        }
+        location.reload();
+    }
+
+	function finishSession() {
+		clearInterval(timerInterval);
+		
+		// 1. 오답 필터링
+		const wrongQuestions = quizList.filter((q, i) => userAnswers[i].wrongAttempts.length > 0);
+
+		// 2. 화면 전환 (먼저 결과 영역을 보여줌)
+		document.getElementById('q-content-area').style.display = 'none';
+		document.getElementById('quiz-footer').style.display = 'none';
+		document.getElementById('result-area').style.display = 'block';
+
+		// 3. 팝업 대신 화면에 안내 문구와 광고 실행
+		const resultArea = document.getElementById('result-area');
+		resultArea.innerHTML = `
+			<div class="result-card" style="padding: 40px 20px;">
+				<h2 style="color: var(--cbt-dark);">학습 결과를 준비 중입니다</h2>
+				<p style="font-size: 1.2rem; line-height: 1.6; margin: 20px 0;">
+					**잠시 후 틀린 문제를 다시 확인하실 수 있습니다.**<br>
+					상단의 **X표**를 누르면 광고가 닫히고 결과가 나옵니다.
+				</p>
+				<div style="margin-top: 30px; color: #666;">잠시만 기다려 주세요...</div>
+			</div>
+		`;
+
+		// 4. 광고 실행 (안드로이드)
+		if (window.Android) {
+			window.Android.showScoreWithAd();
+		}
+
+		// 5. 광고가 닫힌 것으로 가정하거나 일정 시간 후 오답 리스트 출력
+		// 실제로는 안드로이드에서 광고가 닫힐 때 이 함수를 호출해주는 것이 가장 정확합니다.
+		setTimeout(() => {
+			displayWrongAnswers(wrongQuestions);
+		}, 3000); // 테스트용으로 3초 후 출력 (광고 노출 시간 고려)
+	} 
+
+	function displayWrongAnswers(wrongQuestions) {
+		const resultArea = document.getElementById('result-area');
+		let html = `
+			<div class="result-card">
+				<h2 style="color: #d32f2f;">틀린 문제 다시 보기</h2>
+				<p style="margin-bottom: 20px;">한 번에 맞추지 못한 문제입니다.</p>
+				<div id="wrong-list" style="text-align: left; max-height: 400px; overflow-y: auto; border-top: 1px solid #eee; padding-top: 15px;">
+		`;
+
+		if (wrongQuestions.length === 0) {
+			html += `<div style="text-align:center; padding: 20px;">모든 문제를 한 번에 맞추셨습니다!</div>`;
+		} else {
+			wrongQuestions.forEach((q) => {
+				html += `
+					<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ff5252;">
+						<div style="font-weight: bold; margin-bottom: 5px;">[문제] ${q.q}</div>
+						<div style="color: #007bff; font-weight: bold;">정답: ${q.options[q.answer]}</div>
+						<div style="font-size: 0.95rem; color: #666; margin-top: 5px; background: #fff; padding: 10px; border-radius: 5px;">
+							<b>📑 정답 근거:</b><br>${q.note}
+						</div>
+					</div>
+				`;
+			});
+		}
+
+		html += `
+				</div>
+				<div class="result-btns-grid" style="margin-top: 20px;">
+					
+					<button class="action-btn" style="background: var(--cbt-blue); color: white;" onclick="location.reload()">홈으로</button>
+				</div>
+			</div>
+		`;
+
+		resultArea.innerHTML = html;
+	}
+
+	function adjustFont(delta) {
+		fontSizeLevel = Math.max(0, Math.min(6, fontSizeLevel + delta));
+		const sizes = ["14px", "16px", "18px", "20px", "23px", "26px", "30px"];
+		document.body.style.fontSize = sizes[fontSizeLevel];
+	}
+</script>
+</body>
+</html>
