@@ -326,9 +326,9 @@
     }
 
     function loadQuestion() {
-    const myState = { page: currentIdx };       // state, object
-    const myTitle = `Question ${currentIdx}`;   // title
-    const myUrl = `?page=${currentIdx}`;        // url
+        const myState = { page: currentIdx };       // state, object
+        const myTitle = `Question ${currentIdx}`;   // title
+        const myUrl = `?page=${currentIdx}`;        // url
 
         history.pushState(myState, myTitle, myUrl);
 
@@ -436,7 +436,8 @@
     }
 
     function saveAndExit() {
-        let currentPosition = "init"
+        //let currentPosition = "init"
+        let currentPosition = currentMode
         if(currentMode.includes('모의고사') || currentMode.includes('핵심') || currentMode.includes('영역')) {
             mockHistory[currentMode] = { quizList: quizList, userAnswers: userAnswers, lastIdx: currentIdx, completed: false };
             localStorage.setItem('mockHistory', JSON.stringify(mockHistory));
