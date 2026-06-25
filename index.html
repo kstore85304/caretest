@@ -436,16 +436,7 @@
     }
 
     function saveAndExit() {
-        //let currentPosition = "init"
-        let currentPosition = currentMode
-        if(currentMode.includes('모의고사') || currentMode.includes('핵심') || currentMode.includes('영역') || currentMode.includes('요양')) {
-            mockHistory[currentMode] = { quizList: quizList, userAnswers: userAnswers, lastIdx: currentIdx, completed: false };
-            localStorage.setItem('mockHistory', JSON.stringify(mockHistory));
-            currentPosition = currentMode
-        }
-        else{
-            currentPosition = "home"
-        }
+        let currentPosition = isHereAtSubPage();
         location.reload();
         return(currentPosition);
     }
@@ -458,7 +449,7 @@
             currentPosition = currentMode
         }
         else{
-            currentPosition = "not-sub-page"
+            currentPosition = "home";
         }
         return(currentPosition);
     }
