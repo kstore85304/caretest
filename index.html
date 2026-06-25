@@ -326,6 +326,12 @@
     }
 
     function loadQuestion() {
+    const myState = { page: currentIdx };       // state, object
+    const myTitle = `Question ${currentIdx}`;   // title
+    const myUrl = `?page=${currentIdx}`;        // url
+
+        history.pushState({page: currentIdx}, null, "?page=1");
+
         const q = quizList[currentIdx];
         const state = userAnswers[currentIdx];
         
