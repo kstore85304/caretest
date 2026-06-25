@@ -330,7 +330,7 @@
     const myTitle = `Question ${currentIdx}`;   // title
     const myUrl = `?page=${currentIdx}`;        // url
 
-        history.pushState({page: currentIdx}, null, "?page=1");
+        history.pushState(myState, myTitle, myUrl);
 
         const q = quizList[currentIdx];
         const state = userAnswers[currentIdx];
