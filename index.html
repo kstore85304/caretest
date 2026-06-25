@@ -436,9 +436,14 @@
     }
 
     function saveAndExit() {
+        let currentPosition = "null"
         if(currentMode.includes('모의고사') || currentMode.includes('핵심') || currentMode.includes('영역')) {
             mockHistory[currentMode] = { quizList: quizList, userAnswers: userAnswers, lastIdx: currentIdx, completed: false };
             localStorage.setItem('mockHistory', JSON.stringify(mockHistory));
+            currentPosition = currentMode
+        }
+        else{
+            currentPosition = "home"
         }
         location.reload();
     }
