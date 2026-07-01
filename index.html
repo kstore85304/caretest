@@ -1,51 +1,90 @@
 <!DOCTYPE html>
-<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Page not found</title>
-    <style>
-        :root { --cbt-dark: #2c3e50; --cbt-blue: #34495e; --bg: #f4f7f9; --wrong-gray: #e9ecef; --done-gray: #bdc3c7; }
-        body { font-family: 'Malgun Gothic', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
-
-        .cbt-header { 
-            background: var(--cbt-dark); color: white; padding: 10px 15px; 
-            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'">
+    <title>Page not found &middot;GitHub Pages</title>
+    <style type="text/css" media="screen">
+        body {
+            background-color: #f1f1f1;
+            margin: 0;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .home-icon { width: 24px; height: 24px; cursor: pointer; fill: white; display: flex; align-items: center; }
-        .font-controls { display: flex; align-items: center; gap: 8px; background: #444; padding: 4px 10px; border-radius: 20px; color: white; font-size: 0.9rem; }
-        .font-btn { background: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; color: black; }
-        
-        .home-container { padding: 20px; text-align: center; max-width: 500px; margin: 0 auto; padding-bottom: 100px; }
-        .section-title { text-align: left; font-size: 1.1rem; font-weight: bold; color: var(--cbt-dark); margin: 20px 0 10px 5px; border-left: 4px solid #007bff; padding-left: 10px; }
-        .menu-btn { width: 100%; padding: 18px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 12px; background: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .sub-menu { display: none; background: #e9ecef; border-radius: 12px; padding: 10px; margin-bottom: 15px; }
-        .sub-btn { width: 100%; padding: 14px; margin: 5px 0; border: none; border-radius: 8px; background: #dae4f1; font-size: 1rem; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        .sub-btn.completed { background: var(--done-gray); color: #666; }
 
-        .progress-section { padding: 15px 20px; background: white; border-bottom: 1px solid #eee; }
-        .progress-container { width: 100%; background: #eee; height: 12px; border-radius: 6px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: #4caf50; transition: width 0.3s; }
-        .quiz-container { padding: 20px; max-width: 800px; margin: 0 auto; position: relative; min-height: 400px; }
-        #circle-mark { display: none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; border: 15px solid rgba(255, 0, 0, 0.2); border-radius: 50%; z-index: 999; pointer-events: none; }
-        .opt-box { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #eee; border-radius: 8px; background: white; text-align: left; font-size: inherit; cursor: pointer; position: relative; z-index: 10; line-height: 1.4; }
-        .opt-box.wrong { background: var(--wrong-gray); color: #999; }
-        .opt-box.correct { background: #eef7ff; color: #007bff; font-weight: bold; border-color: #007bff; }
-        
-        .result-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; text-align: center; }
-        .result-score-box { background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0; }
-        .result-btns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .action-btn { padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-next-home { background: var(--cbt-blue); color: white; grid-column: span 2; margin-top: 5px; }
+        .container {
+            margin: 50px auto 40px auto;
+            width: 600px;
+            text-align: center;
+        }
 
-        .footer { position: fixed; bottom: 0; width: 100%; background: #f8f9fa; z-index: 100; border-top: 1px solid #ddd; }
-        .footer-btns { display: flex; width: 100%; }
-        .footer-btns button { flex: 1; padding: 18px; border: none; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-        .prev-btn { background: #6c757d; color: white; border-right: 1px solid #5a6268 !important; }
-        .next-btn { background: var(--cbt-blue); color: white; }
-        .ad-banner { background: #eee; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #777; }
-        .check-btn { border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.9rem; background: white; padding: 5px 12px; }
+        a {
+            color: #4183c4;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            width: 800px;
+            position: relative;
+            left: -100px;
+            letter-spacing: -1px;
+            line-height: 60px;
+            font-size: 60px;
+            font-weight: 100;
+            margin: 0px 0 50px 0;
+            text-shadow: 0 1px 0 #fff;
+        }
+
+        p {
+            color: rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            margin: 25px 0;
+            padding: 0;
+        }
+
+        li {
+            display: table-cell;
+            font-weight: bold;
+            width: 1%;
+        }
+
+        .logo {
+            display: inline-block;
+            margin-top: 35px;
+        }
+
+        .logo-img-2x {
+            display: none;
+        }
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and ( min--moz-device-pixel-ratio: 2), only screen and ( -o-min-device-pixel-ratio: 2/1), only screen and ( min-device-pixel-ratio: 2), only screen and ( min-resolution: 192dpi), only screen and ( min-resolution: 2dppx) {
+            .logo-img-1x {
+                display: none;
+            }
+
+            .logo-img-2x {
+                display: inline-block;
+            }
+        }
+
+        #suggestions {
+            margin-top: 35px;
+            color: #ccc;
+        }
+
+        #suggestions a {
+            color: #666666;
+            font-weight: 200;
+            font-size: 14px;
+            margin: 0 10px;
+        }
     </style>
 </head>
 <body>
@@ -69,7 +108,4 @@
     </div>
 
 </body>
-<footer>
-  <p align="center" font-size="10px" color="grey" style="font-style: italic;"><b>© Copyright 2026 kstore85304@gitgub.com All rights reserved.</b></p>
-</footer>
 </html>
