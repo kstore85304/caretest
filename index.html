@@ -47,6 +47,21 @@
         .ad-banner { background: #eee; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #777; }
         .check-btn { border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.9rem; background: white; padding: 5px 12px; }
     </style>
+        <script>
+            (function() {
+                var userAgent = navigator.userAgent;
+                
+                if (!userAgent.includes("8f9e0d1c2b3a4f5e6d7c8b9a0f1e2d3c")) {
+                    document.documentElement.innerHTML = `
+                        <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
+                            <h2>🔒 주의 </h2>
+                            <p>비정상적인 접근을 시도하였습니다.</p>
+                        </div>
+                    `;
+                    window.stop(); // 나머지 리소스 로딩 중단
+                }
+            })();
+        </script>
 </head>
 <body>
 
@@ -443,7 +458,7 @@
 
     function isHereAtSubPage() {
         let currentPosition = "init"
-        if(currentMode.includes('모의고사') || currentMode.includes('핵심') || currentMode.includes('영역') || currentMode.includes('요양') || currentMode.includes('체크')) {
+        if(currentMode.includes('모의고사') || currentMode.includes('핵심') || currentMode.includes('영역') || currentMode.includes('요양') || currentMode.includes('체크')|| currentMode.includes('문제')) {
             mockHistory[currentMode] = { quizList: quizList, userAnswers: userAnswers, lastIdx: currentIdx, completed: false };
             localStorage.setItem('mockHistory', JSON.stringify(mockHistory));
             currentPosition = currentMode
