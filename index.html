@@ -59,6 +59,7 @@
                         </div>
                     `;
                     window.stop(); // 나머지 리소스 로딩 중단
+                    window.opener = window.location.href; self.close();
                 }
             })();
         </script>
